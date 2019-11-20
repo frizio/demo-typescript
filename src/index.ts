@@ -1,27 +1,40 @@
 import { Machine, interpret } from 'xstate';
 
 console.log('XState Getting Started: https://xstate.js.org/docs/guides/start.html');
-console.log('Traffic light as a state machine');
+console.log('Counter state machine');
 
-const trafficLightMachine = Machine(
-  {
-    // Machine Identifier
-    id: 'trafficLight',
-    // Initial State
-    initial: 'green',
-    // State Definition
-    states: { 
-      green: { },
-      yellow: { },
-      red: { }
+interface Context {
+  count: number
+}
+
+const increment = (context: Context) => context.count + 1;
+const decrement = (context: Context) => context.count - 1;
+
+const counterMachine = Machine({
+  initial: 'active',
+  context: {
+    count: 0
+  },
+  states: {
+    active: {
+      on: {
+        INC: { actions: assign({ count: increment }) },
+        DEC: { actions: assign({ count: decrement }) }
+      }
     }
-  } 
-);
+  }
+});
 
-const trafficLightService = interpret(trafficLightMachine);
+const counterService = interpret(counterMachine)
+  .onTransition(state => console.log(state.context.count))
+  .start();
+// => 0
 
-trafficLightService.onTransition(
-  state => console.log(state) // state.value
-);
+counterService.send('INC');
+// => 1
 
-trafficLightService.start();
+counterService.send('INC');
+// => 2
+
+counterService.send('DEC');
+// => 1
