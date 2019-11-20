@@ -1,34 +1,27 @@
 import { Machine, interpret } from 'xstate';
 
 console.log('XState Getting Started: https://xstate.js.org/docs/guides/start.html');
-console.log('Promise as a state machine');
+console.log('Traffic light as a state machine');
 
-const promiseMachine = Machine({
-  id: 'promise',
-  initial: 'pending',
-  states: {
-    pending: {
-      on: {
-        RESOLVE: 'resolved',
-        REJECT: 'rejected'
-      }
-    },
-    resolved: {
-      type: 'final'
-    },
-    rejected: {
-      type: 'final'
+const trafficLightMachine = Machine(
+  {
+    // Machine Identifier
+    id: 'trafficLight',
+    // Initial State
+    initial: 'green',
+    // State Definition
+    states: { 
+      green: { },
+      yellow: { },
+      red: { }
     }
-  }
-});
-
-const promiseService = interpret(promiseMachine).onTransition(state =>
-  console.log(state.value)
+  } 
 );
 
-// Start the service
-promiseService.start();
-// => 'pending'
+const trafficLightService = interpret(trafficLightMachine);
 
-promiseService.send('RESOLVE');
-// => 'resolved'
+trafficLightService.onTransition(
+  state => console.log(state) // state.value
+);
+
+trafficLightService.start();
